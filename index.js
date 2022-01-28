@@ -35,15 +35,27 @@ async function run() {
     // Get all package api
     app.get("/cars", async (req, res) => {
       const cursor = carsCollection.find({});
-      const cars = await cursor.toArray();
-      console.log(cars);
+      const cars = await cursor.limit(6).toArray();
+      // console.log(cars);
       res.json(cars);
     });
     app.get("/explore", async (req, res) => {
       const cursor = carsCollection.find({});
       const cars = await cursor.toArray();
-      console.log(cars);
+      // console.log(cars);
       res.json(cars);
+    });
+    app.get("/users", async (req, res) => {
+      const cursor = usersCollection.find({});
+      const users = await cursor.toArray();
+      console.log(users);
+      res.json(users);
+    });
+    app.get("/clientEmails", async (req, res) => {
+      const cursor = emailCollection.find({});
+      const emails = await cursor.toArray();
+      // console.log(emails);
+      res.json(emails);
     });
 
     // Get single service
@@ -74,8 +86,9 @@ async function run() {
 
     app.post("/users", async (req, res) => {
       const user = req.body;
+      // console.log(user);
       const result = await usersCollection.insertOne(user);
-      console.log(result);
+      // console.log("user inserted", user);
       res.json(result);
     });
 
@@ -93,7 +106,7 @@ async function run() {
     });
     app.put("/users/admin", async (req, res) => {
       const user = req.body;
-      console.log("Put", user);
+      // console.log("Put", user);
       const filter = { email: user.email };
       const updateDoc = { $set: { role: "admin" } };
       const result = await usersCollection.updateOne(filter, updateDoc);
@@ -126,7 +139,7 @@ async function run() {
     });
 
     //add subscription email
-    app.post("/emails", async (req, res) => {
+    app.post("/clientEmails", async (req, res) => {
       const result = await emailCollection.insertOne(req.body);
       // console.log(result);
       res.json(result);
@@ -134,6 +147,17 @@ async function run() {
 
     // delete operation
     app.delete("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: objectId(id) };
+      const result = await ordersCollection.deleteOne(query);
+      /* if (result.deletedCount === 1) {
+        console.log("Successfully deleted one document.");
+      } else {
+        console.log("No documents matched the query. Deleted 0 documents.");
+      } */
+      res.json(result);
+    });
+    app.delete("/myorders/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: objectId(id) };
       const result = await ordersCollection.deleteOne(query);
