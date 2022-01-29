@@ -29,35 +29,16 @@ async function run() {
     const carsCollection = database.collection("cars");
     const emailCollection = database.collection("clientEmails");
     const ordersCollection = database.collection("orders");
-    // const adminPannel = database.collection("admins");
     const usersCollection = database.collection("users");
+    const reviewsCollection = database.collection("reviews");
 
-    // Get all package api
+    // Get all limitedcars api
     app.get("/cars", async (req, res) => {
       const cursor = carsCollection.find({});
       const cars = await cursor.limit(6).toArray();
       // console.log(cars);
       res.json(cars);
     });
-    app.get("/explore", async (req, res) => {
-      const cursor = carsCollection.find({});
-      const cars = await cursor.toArray();
-      // console.log(cars);
-      res.json(cars);
-    });
-    app.get("/users", async (req, res) => {
-      const cursor = usersCollection.find({});
-      const users = await cursor.toArray();
-      console.log(users);
-      res.json(users);
-    });
-    app.get("/clientEmails", async (req, res) => {
-      const cursor = emailCollection.find({});
-      const emails = await cursor.toArray();
-      // console.log(emails);
-      res.json(emails);
-    });
-
     // Get single service
     app.get("/cars/:id", async (req, res) => {
       const id = req.params.id;
@@ -65,6 +46,27 @@ async function run() {
       const package = await carsCollection.findOne(query);
       // console.log("hello from inside dynamic route");
       res.json(package);
+    });
+    // get all cars
+    app.get("/explore", async (req, res) => {
+      const cursor = carsCollection.find({});
+      const cars = await cursor.toArray();
+      // console.log(cars);
+      res.json(cars);
+    });
+    // get users
+    app.get("/users", async (req, res) => {
+      const cursor = usersCollection.find({});
+      const users = await cursor.toArray();
+      // console.log(users);
+      res.json(users);
+    });
+    // email section
+    app.get("/clientEmails", async (req, res) => {
+      const cursor = emailCollection.find({});
+      const emails = await cursor.toArray();
+      // console.log(emails);
+      res.json(emails);
     });
 
     // Get all ordersCollection
@@ -104,6 +106,8 @@ async function run() {
       );
       res.json(result);
     });
+
+    // making admin
     app.put("/users/admin", async (req, res) => {
       const user = req.body;
       // console.log("Put", user);
@@ -112,7 +116,7 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.json(result);
     });
-
+    // finding admin
     app.get("/users/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
@@ -127,7 +131,6 @@ async function run() {
     // order booking
     app.post("/orders", async (req, res) => {
       const order = req.body;
-      // console.log("hit the post api", order);
       const result = await ordersCollection.insertOne(order);
       // console.log(result);
       res.json(result);
@@ -150,23 +153,28 @@ async function run() {
       const id = req.params.id;
       const query = { _id: objectId(id) };
       const result = await ordersCollection.deleteOne(query);
-      /* if (result.deletedCount === 1) {
-        console.log("Successfully deleted one document.");
-      } else {
-        console.log("No documents matched the query. Deleted 0 documents.");
-      } */
+
       res.json(result);
     });
+
     app.delete("/myorders/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: objectId(id) };
       const result = await ordersCollection.deleteOne(query);
-      /* if (result.deletedCount === 1) {
-        console.log("Successfully deleted one document.");
-      } else {
-        console.log("No documents matched the query. Deleted 0 documents.");
-      } */
       res.json(result);
+    });
+
+    // review post and get
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewsCollection.insertOne(review);
+      console.log(review);
+      res.json(result);
+    });
+    app.get("/reviews", async (req, res) => {
+      const cursor = reviewsCollection.find({});
+      const reviews = await cursor.toArray();
+      res.send(reviews);
     });
   } finally {
     // await client.close();
