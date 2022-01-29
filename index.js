@@ -119,6 +119,7 @@ async function run() {
     // finding admin
     app.get("/users/:email", async (req, res) => {
       const email = req.params.email;
+      // console.log(email);
       const query = { email: email };
       const user = await usersCollection.findOne(query);
       let isAdmin = false;
